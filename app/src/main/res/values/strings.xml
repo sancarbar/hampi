@@ -9,4 +9,7 @@
   <string name="logout">Logout</string>
   <string name="share">Share</string>
   <string name="settings">Settings</string>
+  <string name="web_client_id"> 660294914082-mp02mdpes2q756r4as82kqhvg2d9lksf.apps.googleusercontent.com</string>
+  <string name="loading">loading…</string>
+  <string name="natural_medicine_for_everyone">Natural medicine for everyone</string>
 </resources>

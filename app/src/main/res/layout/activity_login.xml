@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/colorAccent"
+              android:gravity="center_horizontal"
+              android:orientation="vertical">
+
+
+  <ImageView
+      android:layout_width="100dp"
+      android:layout_height="100dp"
+      android:layout_marginTop="90dp"
+      android:padding="1dp"
+      android:src="@drawable/leaf_icon" />
+
+  <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:gravity="center"
+      android:text="@string/app_name"
+      android:textColor="@color/cream"
+      android:textSize="30sp"
+      android:textStyle="bold" />
+
+  <TextView
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginBottom="50dp"
+      android:gravity="center"
+      android:padding="15dp"
+      android:text="@string/natural_medicine_for_everyone"
+      android:textColor="@color/cream"
+      android:textSize="20sp" />
+
+  <com.google.android.gms.common.SignInButton
+      android:id="@+id/signInButton"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:onClick="onGoogleSignInClicked" />
+
+</LinearLayout>
