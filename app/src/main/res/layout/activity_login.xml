@@ -8,6 +8,7 @@
 
 
   <ImageView
+      android:contentDescription="@string/application_icon"
       android:layout_width="100dp"
       android:layout_height="100dp"
       android:layout_marginTop="90dp"
@@ -36,7 +37,6 @@
   <com.google.android.gms.common.SignInButton
       android:id="@+id/signInButton"
       android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:onClick="onGoogleSignInClicked" />
+      android:layout_height="wrap_content" />
 
 </LinearLayout>

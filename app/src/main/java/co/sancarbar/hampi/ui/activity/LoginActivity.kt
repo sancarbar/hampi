@@ -1,7 +1,6 @@
 package co.sancarbar.hampi.ui.activity
 
 import android.app.Activity
-import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -20,9 +19,7 @@ import kotlinx.android.synthetic.main.activity_login.*
  * @author Santiago Carrillo
  * 7/19/18.
  */
-class LoginActivity : Activity(), FirebaseAuth.AuthStateListener {
-
-    private lateinit var progresDialog: ProgressDialog
+class LoginActivity : Activity(), FirebaseAuth.AuthStateListener, View.OnClickListener {
 
     private lateinit var googleSignInClient: GoogleSignInClient
 
@@ -35,14 +32,10 @@ class LoginActivity : Activity(), FirebaseAuth.AuthStateListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         signInButton.setSize(SignInButton.SIZE_WIDE)
+        signInButton.setOnClickListener(this)
         initGoogleSignInClient()
-        configureProgressDialog()
     }
 
-    private fun configureProgressDialog() {
-        progresDialog = ProgressDialog(this)
-        progresDialog.setMessage(getString(R.string.loading))
-    }
 
 
     private fun initGoogleSignInClient() {
@@ -54,9 +47,12 @@ class LoginActivity : Activity(), FirebaseAuth.AuthStateListener {
         googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions)
     }
 
-    fun onGoogleSignInClicked(view: View) {
 
+    override fun onClick(v: View?) {
+        signInButton.isEnabled = false
+        startActivityForResult(googleSignInClient.signInIntent, RC_SIGN_IN)
     }
+
 
     override fun onAuthStateChanged(firebaseAuth: FirebaseAuth) {
 
@@ -83,7 +79,7 @@ class LoginActivity : Activity(), FirebaseAuth.AuthStateListener {
             } else {
                 enableSignInButton()
             }
-
+            signInButton.isEnabled = true
         }
     }
 
