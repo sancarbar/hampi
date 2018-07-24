@@ -3,7 +3,6 @@ package co.sancarbar.hampi.ui.activity
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import co.sancarbar.hampi.R
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -19,7 +18,7 @@ import kotlinx.android.synthetic.main.activity_login.*
  * @author Santiago Carrillo
  * 7/19/18.
  */
-class LoginActivity : Activity(), FirebaseAuth.AuthStateListener, View.OnClickListener {
+class LoginActivity : Activity(), FirebaseAuth.AuthStateListener {
 
     private lateinit var googleSignInClient: GoogleSignInClient
 
@@ -32,7 +31,10 @@ class LoginActivity : Activity(), FirebaseAuth.AuthStateListener, View.OnClickLi
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         signInButton.setSize(SignInButton.SIZE_WIDE)
-        signInButton.setOnClickListener(this)
+        signInButton.setOnClickListener {
+            signInButton.isEnabled = false
+            startActivityForResult(googleSignInClient.signInIntent, RC_SIGN_IN)
+        }
         initGoogleSignInClient()
     }
 
@@ -45,12 +47,6 @@ class LoginActivity : Activity(), FirebaseAuth.AuthStateListener, View.OnClickLi
                 .build()
 
         googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions)
-    }
-
-
-    override fun onClick(v: View?) {
-        signInButton.isEnabled = false
-        startActivityForResult(googleSignInClient.signInIntent, RC_SIGN_IN)
     }
 
 
