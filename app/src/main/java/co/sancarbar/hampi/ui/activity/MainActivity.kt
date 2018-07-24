@@ -3,7 +3,6 @@ package co.sancarbar.hampi.ui.activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.NavigationView
-import android.support.design.widget.Snackbar
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
@@ -16,19 +15,21 @@ import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 
+const val NEW_ENTRY_REQUEST_CODE = 99
+
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, FirebaseAuth.AuthStateListener {
 
 
     private var firebaseAuth = FirebaseAuth.getInstance()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
+        fab.setOnClickListener { _ ->
+            startActivityForResult(Intent(this, NewEntryActivity::class.java), NEW_ENTRY_REQUEST_CODE)
         }
 
         configureNavigationDrawer()

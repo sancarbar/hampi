@@ -24,6 +24,9 @@
     <activity
         android:name=".ui.activity.LoginActivity"
         android:theme="@android:style/Theme.NoTitleBar" />
+
+    <activity android:name=".ui.activity.NewEntryActivity" />
+
   </application>
 
 </manifest>
