@@ -12,4 +12,14 @@
   <string name="natural_medicine_for_everyone">Natural medicine for everyone</string>
   <string name="application_icon">application icon</string>
   <string name="Create_Entry">Create Entry</string>
+  <string name="plant_name">Plant name</string>
+  <string name="take_picture">Take Picture</string>
+  <string name="save">Save</string>
+  <string name="OK">OK</string>
+  <string name="Select_one_option">Select one option</string>
+  <string name="plant_selected_image">Plant Selected Image</string>
+  <string-array name="add_photo_options_array">
+    <item>Gallery</item>
+    <item>Camera</item>
+  </string-array>
 </resources>
