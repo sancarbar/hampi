@@ -18,6 +18,9 @@
   <string name="OK">OK</string>
   <string name="Select_one_option">Select one option</string>
   <string name="plant_selected_image">Plant Selected Image</string>
+  <string name="Upload_photo_error">Upload Photo Error</string>
+  <string name="Unable_to_upload_your_photo_Please_try_again">Unable to upload your photo. Please try again</string>
+  <string name="Choose_from_library">Choose from library</string>
   <string-array name="add_photo_options_array">
     <item>Gallery</item>
     <item>Camera</item>

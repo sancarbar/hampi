@@ -33,12 +33,18 @@
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
-    <activity android:name=".ui.activity.MainActivity" />
+
+    <activity
+        android:name=".ui.activity.MainActivity"
+        android:screenOrientation="portrait" />
     <activity
         android:name=".ui.activity.LoginActivity"
+        android:screenOrientation="portrait"
         android:theme="@android:style/Theme.NoTitleBar" />
 
-    <activity android:name=".ui.activity.NewEntryActivity" />
+    <activity
+        android:name=".ui.activity.NewEntryActivity"
+        android:screenOrientation="portrait" />
 
     <provider
         android:name="android.support.v4.content.FileProvider"
