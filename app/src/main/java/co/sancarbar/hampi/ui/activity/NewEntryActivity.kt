@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import android.view.View
 import co.sancarbar.hampi.R
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_new_entry.*
@@ -37,6 +38,8 @@ const val SELECT_IMAGE_REQUEST_CODE = 86
 
 const val CREATED_ENTRY_KEY = "created_entry_key"
 
+const val DB_COLLECTION_NAME = "plants"
+
 class NewEntryActivity : AppCompatActivity() {
 
 
@@ -47,6 +50,8 @@ class NewEntryActivity : AppCompatActivity() {
     private var storageRef = storage.reference
 
     private lateinit var currentEntry: Plant
+
+    private var firebaseAuth = FirebaseAuth.getInstance()
 
     var db = FirebaseFirestore.getInstance()
 
@@ -87,8 +92,9 @@ class NewEntryActivity : AppCompatActivity() {
     }
 
     private fun saveEntryToDatabase(imageUrl: String) {
-        currentEntry = Plant(name.text.toString(), description.text.toString(), imageUrl)
-        db.collection("plants").add(currentEntry).addOnFailureListener {
+        val user = firebaseAuth.currentUser!!.email
+        currentEntry = Plant(name.text.toString(), description.text.toString(), imageUrl, user!!)
+        db.collection(DB_COLLECTION_NAME).add(currentEntry).addOnFailureListener {
             progressBar.visibility = View.GONE
             save.visibility = View.VISIBLE
             DialogFactory.showInfoDialog(this, R.string.Upload_entry_error, R.string.Unable_to_upload_your_entry_Please_try_again)
@@ -225,7 +231,6 @@ class NewEntryActivity : AppCompatActivity() {
         if (currentPhotoUri != null) {
             val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
             val photoRef = storageRef.child("/plants-images/$timeStamp")
-
             val uploadTask = photoRef.putFile(currentPhotoUri!!)
 
             uploadTask.continueWithTask { task ->

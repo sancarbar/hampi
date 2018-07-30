@@ -27,6 +27,7 @@
   <string name="please_fill_the_plant_name">Please fill the plant name</string>
   <string name="Missing_photo">Missing photo</string>
   <string name="Please_add_a_photo">Please add a photo</string>
+  <string name="plant_photo">plan photo</string>
   <string-array name="add_photo_options_array">
     <item>Gallery</item>
     <item>Camera</item>
