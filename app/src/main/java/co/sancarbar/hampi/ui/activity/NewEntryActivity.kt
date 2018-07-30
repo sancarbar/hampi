@@ -11,14 +11,14 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.support.v4.content.FileProvider
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import co.sancarbar.hampi.R
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
-import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_new_entry.*
 import kotlinx.android.synthetic.main.new_entry_form.*
+import model.Plant
 import ui.utils.DialogFactory
 import java.io.File
 import java.io.IOException
@@ -31,18 +31,24 @@ import java.util.*
  * 7/24/18.
  */
 
-val TAKE_PHOTO_REQUEST_CODE = 85
+const val TAKE_PHOTO_REQUEST_CODE = 85
 
-val SELECT_IMAGE_REQUEST_CODE = 86
+const val SELECT_IMAGE_REQUEST_CODE = 86
+
+const val CREATED_ENTRY_KEY = "created_entry_key"
 
 class NewEntryActivity : AppCompatActivity() {
 
 
-    lateinit var currentPhotoUri: Uri
+    private var currentPhotoUri: Uri? = null
 
     private var storage: FirebaseStorage = FirebaseStorage.getInstance("gs://hampi-m.appspot.com")
 
-    private var storageRef = storage.getReference()
+    private var storageRef = storage.reference
+
+    private lateinit var currentEntry: Plant
+
+    var db = FirebaseFirestore.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,8 +78,47 @@ class NewEntryActivity : AppCompatActivity() {
         }
 
         save.setOnClickListener {
-            uploadImage()
+            if (validateForm()) {
+                save.visibility = View.GONE
+                progressBar.visibility = View.VISIBLE
+                uploadImage()
+            }
         }
+    }
+
+    private fun saveEntryToDatabase(imageUrl: String) {
+        currentEntry = Plant(name.text.toString(), description.text.toString(), imageUrl)
+        db.collection("plants").add(currentEntry).addOnFailureListener {
+            progressBar.visibility = View.GONE
+            save.visibility = View.VISIBLE
+            DialogFactory.showInfoDialog(this, R.string.Upload_entry_error, R.string.Unable_to_upload_your_entry_Please_try_again)
+        }.addOnCompleteListener {
+            val data = Intent()
+            data.putExtra(CREATED_ENTRY_KEY, currentEntry)
+            setResult(RESULT_OK, data)
+            finish()
+        }
+    }
+
+    private fun validateForm(): Boolean {
+        if (name.text.isEmpty()) {
+            name.error = getString(R.string.please_fill_the_plant_name)
+            return false
+        } else {
+            name.error = null
+        }
+        if (description.text.isEmpty()) {
+            description.error = getString(R.string.please_fill_the_plant_name)
+            return false
+        } else {
+            description.error = null
+        }
+        if (currentPhotoUri == null) {
+
+            DialogFactory.showInfoDialog(this, R.string.Missing_photo, R.string.Please_add_a_photo)
+            return false
+        }
+        return true
     }
 
     private fun startPhotoSelectingFromExistingSources() {
@@ -154,7 +199,7 @@ class NewEntryActivity : AppCompatActivity() {
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP) {
             bmOptions.inPurgeable = true
         }
-        val bitmap = BitmapFactory.decodeFile(currentPhotoUri.path, bmOptions)
+        val bitmap = BitmapFactory.decodeFile(currentPhotoUri!!.path, bmOptions)
         imageView.setImageBitmap(bitmap)
     }
 
@@ -176,47 +221,30 @@ class NewEntryActivity : AppCompatActivity() {
     }
 
     private fun uploadImage() {
-        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val photoRef = storageRef.child("/plants-images/$timeStamp")
 
-        val uploadTask = photoRef.putFile(currentPhotoUri)
+        if (currentPhotoUri != null) {
+            val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+            val photoRef = storageRef.child("/plants-images/$timeStamp")
 
-        uploadTask.continueWithTask { task ->
-            if (!task.isSuccessful) {
-                throw task.exception!!
-            }
-            photoRef.downloadUrl
-        }.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val downloadUri = task.result
-                Log.d("Developer", "DownloadUri $downloadUri")
-                Picasso.get().load(downloadUri).into(imageView)
+            val uploadTask = photoRef.putFile(currentPhotoUri!!)
 
-            } else {
-                DialogFactory.showInfoDialog(this, R.string.Upload_photo_error, R.string.Unable_to_upload_your_photo_Please_try_again)
+            uploadTask.continueWithTask { task ->
+                if (!task.isSuccessful) {
+                    progressBar.visibility = View.GONE
+                    save.visibility = View.VISIBLE
+                    throw task.exception!!
+                }
+                photoRef.downloadUrl
+            }.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val downloadUri = task.result
+                    saveEntryToDatabase(downloadUri.toString())
+                } else {
+                    progressBar.visibility = View.GONE
+                    save.visibility = View.VISIBLE
+                    DialogFactory.showInfoDialog(this, R.string.Upload_photo_error, R.string.Unable_to_upload_your_photo_Please_try_again)
+                }
             }
         }
-
-
-//        imageView.buildDrawingCache()
-//        val bitmap = (imageView.drawable as BitmapDrawable).bitmap
-//        val byteArrayOutputStream = ByteArrayOutputStream()
-//        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
-//        val data = byteArrayOutputStream.toByteArray()
-//
-//        val uploadTask = photoRef.putBytes(data)
-//
-//
-//
-//
-//
-//        uploadTask.addOnFailureListener {
-//
-//        }
-//        uploadTask.addOnSuccessListener  {taskSnapshot -> taskSnapshot.
-//
-//        }
-
-
     }
 }
