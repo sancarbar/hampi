@@ -8,10 +8,12 @@ import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.MenuItem
 import android.widget.TextView
 import co.sancarbar.hampi.R
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.android.synthetic.main.activity_main.*
@@ -19,6 +21,8 @@ import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import model.Plant
 import ui.adapter.PlantsEntriesAdapter
+import java.util.concurrent.Executors
+
 
 const val NEW_ENTRY_REQUEST_CODE = 99
 
@@ -29,19 +33,49 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private val plantsAdapter = PlantsEntriesAdapter()
 
+    private var firestore = FirebaseFirestore.getInstance()
+
+    private val executor = Executors.newFixedThreadPool(1)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        fab.setOnClickListener { _ ->
+        fab.setOnClickListener {
             startActivityForResult(Intent(this, NewEntryActivity::class.java), NEW_ENTRY_REQUEST_CODE)
         }
 
         configureNavigationDrawer()
         firebaseAuth.addAuthStateListener(this)
         configureRecyclerView()
+        loadData()
+    }
+
+    private fun loadData() {
+        executor.execute {
+            firestore.collection("plants")
+                    .get()
+                    .addOnCompleteListener { task ->
+
+                        if (task.isSuccessful) {
+                            for (document in task.result) {
+                                val plant = document.toObject(Plant::class.java)
+                                runOnUiThread {
+                                    plantsAdapter.add(plant)
+                                }
+
+                                Log.e("Developer", "Adding plant!!")
+                            }
+                        } else {
+                            Log.e("Developer", "Error getting documents: ", task.exception)
+                        }
+
+                    }
+
+        }
+
     }
 
     private fun configureRecyclerView() {

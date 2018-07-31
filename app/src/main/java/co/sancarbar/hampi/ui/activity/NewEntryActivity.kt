@@ -53,7 +53,7 @@ class NewEntryActivity : AppCompatActivity() {
 
     private var firebaseAuth = FirebaseAuth.getInstance()
 
-    var db = FirebaseFirestore.getInstance()
+    var firestore = FirebaseFirestore.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,7 +94,7 @@ class NewEntryActivity : AppCompatActivity() {
     private fun saveEntryToDatabase(imageUrl: String) {
         val user = firebaseAuth.currentUser!!.email
         currentEntry = Plant(name.text.toString(), description.text.toString(), imageUrl, user!!)
-        db.collection(DB_COLLECTION_NAME).add(currentEntry).addOnFailureListener {
+        firestore.collection(DB_COLLECTION_NAME).add(currentEntry).addOnFailureListener {
             progressBar.visibility = View.GONE
             save.visibility = View.VISIBLE
             DialogFactory.showInfoDialog(this, R.string.Upload_entry_error, R.string.Unable_to_upload_your_entry_Please_try_again)
